@@ -1,0 +1,101 @@
+[gd_scene load_steps=10 format=3 uid="uid://bdejg4h8dfons"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_m0pmr"]
+[ext_resource type="LabelSettings" uid="uid://ckqy5nuv6itsk" path="res://basic outline.tres" id="2_efx32"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_oysrh"]
+bounce = 0.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_y4wtt"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7symc"]
+albedo_color = Color(0, 1, 1, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_3xipp"]
+material = SubResource("StandardMaterial3D_7symc")
+radius = 10.0
+height = 20.0
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_o5ls5"]
+normal = Vector2(0, 1)
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_36b0s"]
+normal = Vector2(1, 0)
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_683pc"]
+normal = Vector2(-1, 0)
+distance = -1152.0
+
+[node name="main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_m0pmr")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -152.0
+offset_bottom = 23.0
+grow_horizontal = 0
+text = "Press enter to reset"
+label_settings = ExtResource("2_efx32")
+
+[node name="ScoreLabel" type="Label" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Score:0"
+label_settings = ExtResource("2_efx32")
+
+[node name="TimeLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
+
+[node name="2D" type="Node2D" parent="."]
+
+[node name="ball" type="RigidBody2D" parent="2D"]
+position = Vector2(550, 91)
+collision_mask = 3
+mass = 0.25
+physics_material_override = SubResource("PhysicsMaterial_oysrh")
+contact_monitor = true
+max_contacts_reported = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="2D/ball"]
+shape = SubResource("CircleShape2D_y4wtt")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="2D/ball"]
+mesh = SubResource("SphereMesh_3xipp")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="2D/ball"]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="2D"]
+collision_layer = 2
+collision_mask = 2
+
+[node name="worldbordertop" type="CollisionShape2D" parent="2D/StaticBody2D"]
+shape = SubResource("WorldBoundaryShape2D_o5ls5")
+
+[node name="worldborderleft" type="CollisionShape2D" parent="2D/StaticBody2D"]
+shape = SubResource("WorldBoundaryShape2D_36b0s")
+
+[node name="worldborderright" type="CollisionShape2D" parent="2D/StaticBody2D"]
+shape = SubResource("WorldBoundaryShape2D_683pc")
+
+[node name="Timer" type="Timer" parent="."]
+
+[connection signal="body_exited" from="2D/ball" to="." method="_on_ball_body_exited"]
+[connection signal="screen_exited" from="2D/ball/VisibleOnScreenNotifier2D" to="." method="_on_ball_exited"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
